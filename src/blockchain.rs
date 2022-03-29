@@ -4,6 +4,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 const HASH_TARGET: &str = "000";
 
+#[derive(Clone, Serialize)]
 pub struct Blockchain {
     chain: Vec<Block>,
 }
@@ -37,12 +38,13 @@ impl Blockchain {
         true
     }
 
-    pub fn mine_block(&mut self) {
+    pub fn mine_block(&mut self) -> Option<&Block> {
         match self.previous_block() {
             Some(previous_block) => {
                 let mut block = self.create_block(hash(previous_block));
                 block.calculate_proof_of_work();
                 self.chain.push(block);
+                self.chain.last()
             }
             None => panic!("Can't mine a new block without a genesis block"),
         }
@@ -71,7 +73,7 @@ pub fn hash(block: &Block) -> String {
     sha256::digest(json)
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct Block {
     index: usize,
     previous_hash: String,

@@ -13,7 +13,8 @@ fn mine_block_adds_new_blocks_to_the_chain() {
     let mut chain = Blockchain::new();
     chain.mine_block();
     chain.mine_block();
-    chain.mine_block();
+    let block = chain.mine_block().unwrap();
+    assert_eq!(block.index, 4);
     assert_eq!(chain.chain.len(), 4);
 }
 

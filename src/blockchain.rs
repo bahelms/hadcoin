@@ -49,6 +49,10 @@ impl Blockchain {
             None => panic!("Can't mine a new block without a genesis block"),
         }
     }
+
+    pub fn len(&self) -> usize {
+        self.chain.len()
+    }
 }
 
 impl fmt::Debug for Blockchain {

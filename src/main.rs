@@ -3,6 +3,7 @@ mod blockchain;
 use blockchain::Blockchain;
 use hyper::service::{make_service_fn, service_fn};
 use hyper::{Body, Method, Request, Response, Server, StatusCode};
+use serde_json::json;
 use std::convert::Infallible;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::sync::{Arc, Mutex};
@@ -16,12 +17,16 @@ async fn handle_request(
 
     match (req.method(), req.uri().path()) {
         (&Method::GET, "/chain") => {
-            let json = serde_json::to_string(&*chain).expect("Error serializing");
+            let mut data = json!(*chain);
+            data["length"] = json!((*chain).len());
+            let json = serde_json::to_string(&data).expect("Error serializing");
             *response.body_mut() = Body::from(json);
         }
         (&Method::POST, "/mine") => {
             let block = chain.mine_block().expect("Mining failed");
-            let json = serde_json::to_string(block).expect("Error serializing");
+            let mut data = json!(block);
+            data["message"] = json!("Successfully mined a block!");
+            let json = serde_json::to_string(&data).expect("Error serializing");
             *response.body_mut() = Body::from(json);
         }
         _ => {
